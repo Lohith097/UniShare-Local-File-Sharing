@@ -24,3 +24,4 @@ If the classroom PC is locked down or does not have Python installed, use the pr
 1. Go to the [Releases](https://github.com/Lohith097/UniShare-Local-File-Sharing/releases) page and download `server.exe`.
 2. Place `server.exe` anywhere on the PC (or run it straight from a flash drive).
 3. Double-click it to launch the hub instantly. The web interface is bundled inside!
+4. Use QR to upload from Mobile and you can open the laptop interface from the link in cmd after running.
