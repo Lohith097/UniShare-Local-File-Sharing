@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniShare - Local Hub</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .panel { background: #1e293b; padding: 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .flex-row { display: flex; gap: 20px; flex-wrap: wrap; }
+        .flex-1 { flex: 1; min-width: 300px; }
+        
+        button { padding: 12px 24px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
+        button:hover { background: #2563eb; }
+        input[type="file"] { margin-bottom: 15px; width: 100%; }
+        
+        #qr-container { background: white; padding: 15px; border-radius: 8px; display: inline-block; }
+        
+        .file-list { list-style: none; padding: 0; margin: 0; }
+        .file-list li { background: #334155; margin-bottom: 8px; padding: 12px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
+        .file-list a { color: #60a5fa; text-decoration: none; font-weight: bold; }
+        .file-list a:hover { text-decoration: underline; color: #93c5fd; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1 style="margin: 0; color: #3b82f6;">🚀 UniShare Hub</h1>
+            <p style="color: #94a3b8;">Local Wi-Fi File Sharing (No internet required)</p>
+        </div>
+
+        <div class="flex-row">
+            <div class="panel flex-1">
+                <h2>📤 Upload a File</h2>
+                <p style="font-size: 14px; color: #cbd5e1;">Share a PPT, PDF, or image with the room.</p>
+                <input type="file" id="fileInput">
+                <button onclick="uploadFile()" id="uploadBtn">Upload to Hub</button>
+                <p id="statusMsg" style="text-align: center; font-weight: bold; color: #10b981;"></p>
+            </div>
+
+            <div class="panel flex-1" style="text-align: center;">
+                <h2>📱 Join the Hub</h2>
+                <div id="qr-container"></div>
+                <p id="ip-display" style="color: #4ade80; font-size: 13px; margin-top: 15px; word-break: break-all;"></p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>📥 Available Files</h2>
+            <ul class="file-list" id="fileList">
+                <li>Loading files...</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const currentUrl = window.location.href.split('?')[0];
+        new QRCode(document.getElementById("qr-container"), { text: currentUrl, width: 150, height: 150 });
+        document.getElementById('ip-display').innerText = currentUrl;
+
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const btn = document.getElementById('uploadBtn');
+            const status = document.getElementById('statusMsg');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert("Please select a file first!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Uploading... Please wait";
+            status.innerText = "";
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    headers: {
+                        'File-Name': encodeURIComponent(file.name),
+                        'Content-Type': 'application/octet-stream'
+                    },
+                    body: file 
+                });
+
+                if (response.ok) {
+                    status.innerText = "Success! File added to hub.";
+                    fileInput.value = ""; 
+                    fetchFiles(); 
+                }
+            } catch (e) {
+                status.style.color = "#ef4444";
+                status.innerText = "Upload failed. Check connection.";
+            }
+
+            btn.disabled = false;
+            btn.innerText = "Upload to Hub";
+        }
+
+        async function fetchFiles() {
+            try {
+                const response = await fetch('/list_files');
+                const files = await response.json();
+                
+                const list = document.getElementById('fileList');
+                list.innerHTML = "";
+                
+                if (files.length === 0) {
+                    list.innerHTML = "<li style='color: #94a3b8; justify-content: center;'>No files uploaded yet.</li>";
+                    return;
+                }
+
+                files.forEach(f => {
+                    list.innerHTML += `
+                        <li>
+                            <span>📄 ${f}</span>
+                            <a href="/download/${encodeURIComponent(f)}" download="${f}">Download ↓</a>
+                        </li>
+                    `;
+                });
+            } catch (e) {
+                console.error("Could not fetch file list");
+            }
+        }
+
+        fetchFiles();
+        setInterval(fetchFiles, 3000);
+    </script>
+</body>
+</html>
