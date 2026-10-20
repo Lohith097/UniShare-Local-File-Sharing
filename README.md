@@ -19,9 +19,8 @@ If you have Python installed but don't want to use the terminal:
 
 *The script will automatically check for Python, install the required QR code library, find the local Wi-Fi IP, and display a giant QR code on the projector.*
 
-### Option 3: Standalone Executable (No Python Required)
-If the classroom PC is locked down or does not have Python installed, use the pre-built executable.
+### Option 3: Standalone Executable (Zero Install)
+If the classroom PC is locked down or does not have Python installed, use the pre-built bundled executable.
 1. Go to the [Releases](https://github.com/Lohith097/UniShare-Local-File-Sharing/releases) page and download `server.exe`.
-2. Download `index.html` from the main repository.
-3. Place both files in the exact same folder on your flash drive or desktop.
-4. Double-click `server.exe` to launch the hub instantly.
+2. Place `server.exe` anywhere on the PC (or run it straight from a flash drive).
+3. Double-click it to launch the hub instantly. The web interface is bundled inside!
