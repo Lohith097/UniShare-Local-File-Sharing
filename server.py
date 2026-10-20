@@ -1,11 +1,12 @@
 import os
+import sys
 import socket
 import urllib.parse
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 PORT = 8000
 SHARED_DIR = "SharedFiles"
-INDEX_FILE = "index.html"
+INDEX_FILE = "index.html" # Assuming you renamed it to index.html
 
 if not os.path.exists(SHARED_DIR):
     os.makedirs(SHARED_DIR)
@@ -45,7 +46,25 @@ class ThreadedFileShareHandler(SimpleHTTPRequestHandler):
             self.send_error(404, "Not Found")
 
     def do_GET(self):
-        if self.path == '/list_files':
+        # MAGIC: Intercept the request and serve the bundled HTML file
+        if self.path == '/' or self.path == f'/{INDEX_FILE}':
+            if getattr(sys, 'frozen', False):
+                base_path = sys._MEIPASS # Running as bundled .exe
+            else:
+                base_path = os.path.dirname(os.path.abspath(__file__)) # Running as normal script
+            
+            html_path = os.path.join(base_path, INDEX_FILE)
+            
+            try:
+                with open(html_path, 'rb') as f:
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+                    self.wfile.write(f.read())
+            except FileNotFoundError:
+                self.send_error(404, "HTML file missing!")
+                
+        elif self.path == '/list_files':
             import json
             files = os.listdir(SHARED_DIR)
             self.send_response(200)
