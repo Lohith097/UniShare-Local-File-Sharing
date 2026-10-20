@@ -5,7 +5,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 PORT = 8000
 SHARED_DIR = "SharedFiles"
-INDEX_FILE = "index2.html"
+INDEX_FILE = "index.html"
 
 if not os.path.exists(SHARED_DIR):
     os.makedirs(SHARED_DIR)
