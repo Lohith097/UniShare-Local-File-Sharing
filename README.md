@@ -9,6 +9,7 @@ If the classroom PC has Git and Python installed, open Command Prompt (`cmd`) an
 
 ```cmd
 git clone [https://github.com/Lohith097/UniShare-Local-File-Sharing.git](https://github.com/Lohith097/UniShare-Local-File-Sharing.git) && cd UniShare-Local-File-Sharing && run_hub.bat
+```
 
 ### Option 2: The Flash Drive / ZIP Method
 If you have Python installed but don't want to use the terminal:
